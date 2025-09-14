@@ -3,6 +3,8 @@ from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 import os
 
+import importlib
+
 COMETS_DIR = "comets"
 
 class CometMenu:
@@ -67,4 +69,19 @@ class CometMenu:
     def on_comet_selected(self, current, previous):
         self.menu_frame.hide()
         if current:
-            print(f"Комета {current.text()} выбрана")
+            comet_id = current.text().lower().replace(" ", "_")
+            page = self.create_comet_page(comet_id)
+            self.stacked_layout.addWidget(page)
+            self.stacked_layout.setCurrentWidget(page)
+
+    def create_comet_page(self, comet_id):
+        module_path = f"comets.{comet_id}.main"
+        try:
+            comet_module = importlib.import_module(module_path)
+            return comet_module.create_page()
+        except ModuleNotFoundError:
+            print(f"Комета {comet_id} не имеет main.py")
+            from PyQt6.QtWidgets import QLabel
+            lbl = QLabel(f"Комета {comet_id} пустая")
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            return lbl

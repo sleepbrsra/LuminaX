@@ -1,8 +1,9 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QStackedLayout
-from PyQt6.QtGui import QPalette, QColor
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QStackedLayout, QLabel, QFrame
+from PyQt6.QtGui import QPalette, QColor, QFont
 from PyQt6.QtCore import Qt
 from modules.gui_settings import SettingsMenu
 from modules.gui_menu import CometMenu
+
 
 class LuminaXGUI:
     def __init__(self):
@@ -24,6 +25,23 @@ class LuminaXGUI:
         # --- Главная область ---
         self.stacked_layout = QStackedLayout()
 
+        # --- Контейнер для страниц ---
+        self.page_container = QFrame(self.window)
+        self.page_layout = QVBoxLayout()
+        self.page_layout.setContentsMargins(0, 0, 0, 0)
+        self.page_container.setLayout(self.page_layout)
+        self.stacked_layout.addWidget(self.page_container)
+
+        # --- Приветственный текст ---
+        self.empty_label = QLabel(
+            "🌌 Добро пожаловать в LuminaX!\nВыберите комету сверху, чтобы начать.",
+            self.page_container
+        )
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.empty_label.setFont(QFont("Arial", 18, QFont.Weight.Bold))
+        self.empty_label.setStyleSheet("color: #00fff7;")
+        self.page_layout.addWidget(self.empty_label)
+
         # --- Кнопка настроек ---
         self.settings = SettingsMenu(self.window)
         top_bar.addStretch()
@@ -35,7 +53,7 @@ class LuminaXGUI:
 
         # --- Основной layout ---
         self.main_layout = QVBoxLayout()
-        self.main_layout.setContentsMargins(0,0,0,0)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.addLayout(top_bar)
         self.main_layout.addLayout(self.stacked_layout)
 
