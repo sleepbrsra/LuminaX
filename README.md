@@ -29,7 +29,15 @@ LuminaX/
 
 ## 🛠 Установка и запуск
 
-X
+```
+cd LuminaX/etc
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+//
+cd LuminaX/
+python3 main.py
+```
 
 ---
 
