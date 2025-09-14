@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QPushButton, QFrame, QListWidget, QVBoxLayout, QLabel
+from PyQt6.QtWidgets import QPushButton, QWidget, QListWidget, QVBoxLayout, QLabel, QFrame
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 import os
@@ -28,16 +28,36 @@ class CometMenu:
         """)
         self.button.clicked.connect(self.toggle_menu)
 
-        # Плавающее меню (отдельное окно)
-        self.menu_list = QListWidget()
+        # Плавающее меню комет
+        self.menu_frame = QFrame(self.window, Qt.WindowType.Popup)
+        self.menu_frame.setStyleSheet("""
+            QFrame { background-color: #0f0f2a; border: 2px solid #00fff7; border-radius: 8px; }
+        """)
+        self.menu_frame.setVisible(False)
+
+        self.menu_list = QListWidget(self.menu_frame)
         self.menu_list.setStyleSheet("""
-            QListWidget { background-color: #0f0f2a; color: #9d9dff; border: 2px solid #00fff7; border-radius: 8px; padding: 5px; }
+            QListWidget { background-color: transparent; color: #9d9dff; border: none; padding: 5px; }
             QListWidget::item:selected { background-color: #00fff7; color: #0d0d1a; }
         """)
-        self.menu_list.setWindowFlags(Qt.WindowType.Popup)
         self.menu_list.currentItemChanged.connect(self.on_comet_selected)
 
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0,0,0,0)
+        layout.addWidget(self.menu_list)
+        self.menu_frame.setLayout(layout)
+
         self.load_comets()
+
+    def toggle_menu(self):
+        if self.menu_frame.isVisible():
+            self.menu_frame.hide()
+        else:
+            rows = self.menu_list.count()
+            self.menu_frame.setFixedSize(200, max(50, rows * 25))
+            pos = self.button.mapToGlobal(self.button.rect().bottomLeft())
+            self.menu_frame.move(pos)
+            self.menu_frame.show()
 
     def load_comets(self):
         self.menu_list.clear()
@@ -48,17 +68,8 @@ class CometMenu:
             if os.path.isdir(os.path.join(COMETS_DIR, comet_name)):
                 self.menu_list.addItem(comet_name.replace("_", " ").title())
 
-    def toggle_menu(self):
-        if self.menu_list.isVisible():
-            self.menu_list.hide()
-        else:
-            self.menu_list.setFixedSize(200, max(50, self.menu_list.count() * 25))
-            pos = self.button.mapToGlobal(self.button.rect().bottomLeft())
-            self.menu_list.move(pos)
-            self.menu_list.show()
-
     def on_comet_selected(self, current, previous):
-        self.menu_list.hide()
+        self.menu_frame.hide()
         if not current:
             return
 
